@@ -1,0 +1,33 @@
+version '3'
+
+services:
+    postgres:
+        image: postgres
+        hostname: postgres
+        ports: 
+            - 5432:5432
+        volumes: 
+            - ./pgdata:/var/lib/postgresql/data
+        env_file: 
+            - .env/postgres.env
+
+    api:
+        build:
+            context: .
+            dockerfile: ./services/app/Dockerfile
+        command: dev
+        ports: 
+            - 8000:8000
+            - 8001:8001
+        volumes: 
+            - ./app:/usr/src/app
+        env_file: 
+            - .env/api.env
+    web:
+        build:
+            context: ./
+            dockerfile: ./services/nginx/Dockerfile
+        ports:
+            - 80:80
+        depends_on:
+            - api
