@@ -1,0 +1,14 @@
+FROM node:14.17.6-slim
+
+RUN adduser --disabled-password --uid 10777 --gecos "" app
+
+# Add project repository and own the directory contents
+ADD . /home/app/app-core
+RUN chown -R app /home/app/app-core
+
+USER app
+WORKDIR /home/app/app-core
+
+RUN npm install 
+
+EXPOSE 3000

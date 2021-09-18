@@ -1,33 +1,46 @@
 version '3'
 
 services:
-    postgres:
+    app-db:
         image: postgres
-        hostname: postgres
         ports: 
             - 5432:5432
+        container_name: 
+            - app-db
         volumes: 
             - ./pgdata:/var/lib/postgresql/data
         env_file: 
-            - .env/postgres.env
-
-    api:
+            - .env/db.env
+    app-api:
         build:
             context: .
-            dockerfile: ./services/app/Dockerfile
-        command: dev
+            dockerfile: services/api/Dockerfile
         ports: 
             - 8000:8000
             - 8001:8001
+        container_name: 
+            - app-api
         volumes: 
             - ./app:/usr/src/app
         env_file: 
             - .env/api.env
+    app-ui:
+        build:
+            context: .
+            dockerfile: services/ui/Dockerfile
+        ports: 
+            - 3000:3000
+        container_name: 
+            - app-ui
+        env_file: 
+            - .env/ui.env
     web:
         build:
-            context: ./
-            dockerfile: ./services/nginx/Dockerfile
+            context: .
+            dockerfile: services/nginx/Dockerfile
         ports:
             - 80:80
         depends_on:
-            - api
+            - app-db
+            - app-api
+            - app-ui
